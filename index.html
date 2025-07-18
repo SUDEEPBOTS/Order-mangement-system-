@@ -14,6 +14,7 @@
             --light-bg: #f4f9f5;
             --text-color: #333;
             --light-text: #666;
+            --error-color: #ff4444;
         }
         
         body {
@@ -167,6 +168,50 @@
             animation: pulse 2s infinite;
         }
         
+        .create-account-btn {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            margin-top: 15px;
+        }
+        
+        .create-account-btn:hover {
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .account-creation {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            padding: 25px;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+            z-index: 10;
+        }
+        
+        .account-creation.show {
+            bottom: 0;
+        }
+        
+        .account-creation h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--light-text);
+            cursor: pointer;
+        }
+        
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -182,6 +227,10 @@
             
             h1 {
                 font-size: 24px;
+            }
+            
+            .account-creation {
+                padding: 20px 15px;
             }
         }
     </style>
@@ -201,6 +250,10 @@
             </button>
         </form>
         
+        <button class="create-account-btn animate__animated animate__fadeIn animate__delay-3s" id="showCreateAccount">
+            <i class="fas fa-user-plus"></i> Create New Account
+        </button>
+        
         <div class="user-hint animate__animated animate__fadeIn animate__delay-3s">
             Try: <strong>sudeep1998</strong> or <strong>abss123</strong>
         </div>
@@ -210,7 +263,38 @@
         </div>
     </div>
 
+    <div class="account-creation" id="accountCreation">
+        <button class="close-btn" id="closeAccountCreation">&times;</button>
+        <h2>Create New Account</h2>
+        <form id="createAccountForm">
+            <div class="form-group">
+                <label for="fullName"><i class="fas fa-id-card"></i> Full Name</label>
+                <input type="text" id="fullName" required placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label for="age"><i class="fas fa-birthday-cake"></i> Age</label>
+                <input type="number" id="age" required placeholder="Enter your age" min="13">
+            </div>
+            <div class="form-group">
+                <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" id="email" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="phone"><i class="fas fa-phone"></i> Phone Number</label>
+                <input type="tel" id="phone" required placeholder="Enter your phone number">
+            </div>
+            <div class="form-group">
+                <label for="newUsername"><i class="fas fa-user"></i> Username</label>
+                <input type="text" id="newUsername" required placeholder="Choose a username">
+            </div>
+            <button type="submit" class="pulse">
+                <i class="fas fa-user-check"></i> Create Account
+            </button>
+        </form>
+    </div>
+
     <script>
+        // Login functionality
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -247,17 +331,78 @@
                     input.classList.remove('animate__animated', 'animate__headShake');
                 }, 1000);
                 
-                alert('Invalid username. Only "sudeep1998" and "abss123" are allowed.');
+                alert('Invalid username. Please try again or create a new account.');
             }
         });
         
-        // Add focus animation to input
-        document.getElementById('username').addEventListener('focus', function() {
-            this.parentNode.querySelector('label').style.color = 'var(--accent-color)';
+        // Account creation toggle
+        document.getElementById('showCreateAccount').addEventListener('click', function() {
+            document.getElementById('accountCreation').classList.add('show');
         });
         
-        document.getElementById('username').addEventListener('blur', function() {
-            this.parentNode.querySelector('label').style.color = 'var(--secondary-color)';
+        document.getElementById('closeAccountCreation').addEventListener('click', function() {
+            document.getElementById('accountCreation').classList.remove('show');
+        });
+        
+        // Create account functionality
+        document.getElementById('createAccountForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value.trim();
+            const age = document.getElementById('age').value;
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const username = document.getElementById('newUsername').value.trim();
+            
+            // Simple validation
+            if (!fullName || !age || !email || !phone || !username) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (username === 'sudeep1998' || username === 'abss123') {
+                alert('This username is already taken');
+                return;
+            }
+            
+            // Add loading animation
+            const btn = this.querySelector('button');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            btn.disabled = true;
+            
+            // Create user object
+            const newUser = {
+                username: username,
+                name: fullName,
+                age: age,
+                email: email,
+                phone: phone,
+                orders: [],
+                createdAt: new Date().toISOString()
+            };
+            
+            // Simulate account creation
+            setTimeout(() => {
+                // Save to localStorage (in a real app, this would go to a server)
+                localStorage.setItem('currentUser', JSON.stringify(newUser));
+                
+                // Show success message
+                alert(`Account created successfully! Welcome ${fullName}`);
+                
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        });
+        
+        // Add focus animation to inputs
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentNode.querySelector('label').style.color = 'var(--accent-color)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentNode.querySelector('label').style.color = 'var(--secondary-color)';
+            });
         });
     </script>
 </body>
