@@ -4,20 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 300px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
-        <h1>Order Management</h1>
+        <h1>Order System Login</h1>
         <form id="loginForm">
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" required placeholder="Enter username">
             </div>
-            <button type="submit" class="btn">Login</button>
+            <button type="submit">Login</button>
         </form>
-        <p>Valid usernames: <strong>sudeep1998</strong> or <strong>abss123</strong></p>
+        <p style="margin-top: 15px;">Use: <strong>sudeep1998</strong> or <strong>abss123</strong></p>
     </div>
-    <script src="js/auth.js"></script>
+    <script>
+        // Simple Login Functionality
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const validUsers = ['sudeep1998', 'abss123'];
+            
+            if (validUsers.includes(username)) {
+                // Create user object
+                const user = {
+                    username: username,
+                    name: username === 'sudeep1998' ? 'Sudeep' : 'Abhishek',
+                    orders: []
+                };
+                
+                // Save to localStorage and redirect
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                window.location.href = 'dashboard.html';
+            } else {
+                alert('Invalid username. Only "sudeep1998" and "abss123" are allowed.');
+            }
+        });
+    </script>
 </body>
 </html>
