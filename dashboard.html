@@ -574,9 +574,91 @@
                 order.duration = `${hours > 0 ? hours + 'h ' : ''}${minutes}m`;
                 
                 localStorage.setItem('appData', JSON.stringify(appData));
-                
-                // Send Telegram notification
+                         // Send Telegram notification
                 sendTelegramNotification(
                     `✅ ORDER DELIVERED\n\n` +
                     `📦 Tracking #: ${order.trackingNumber}\n` +
                     `🏢 Tower/Flat: ${order.towerNumber}/${order.flatNumber}\n` +
+                    `⏱️ Duration: ${order.duration}\n` +
+                    `🕒 Completed At: ${new Date(order.completedAt).toLocaleString()}`
+                );
+                
+                // Show confetti animation
+                createConfetti();
+                
+                // Refresh dashboard after delay
+                setTimeout(() => {
+                    loadDashboardData();
+                }, 1500);
+            }
+        }
+
+        function cancelOrder(trackingNumber) {
+            if (confirm('Are you sure you want to cancel this order?')) {
+                const appData = JSON.parse(localStorage.getItem('appData'));
+                const order = appData.allOrders.find(o => o.trackingNumber === trackingNumber);
+                
+                if (order) {
+                    order.status = 'Cancelled';
+                    order.cancelledAt = new Date().toISOString();
+                    order.updatedAt = new Date().toISOString();
+                    localStorage.setItem('appData', JSON.stringify(appData));
+                    
+                    // Send Telegram notification
+                    sendTelegramNotification(
+                        `❌ ORDER CANCELLED\n\n` +
+                        `📦 Tracking #: ${order.trackingNumber}\n` +
+                        `🏢 Tower/Flat: ${order.towerNumber}/${order.flatNumber}\n` +
+                        `🕒 Cancelled At: ${new Date(order.cancelledAt).toLocaleString()}`
+                    );
+                    
+                    // Refresh dashboard
+                    loadDashboardData();
+                }
+            }
+        }
+
+        function sendTelegramNotification(message) {
+            if (BOT_TOKEN && CHAT_ID) {
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: CHAT_ID,
+                        text: message,
+                        parse_mode: 'Markdown'
+                    })
+                }).catch(error => console.error('Telegram error:', error));
+            }
+        }
+
+        function createConfetti() {
+            const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196F3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = Math.random() * 10 + 5 + 'px';
+                confetti.style.height = Math.random() * 10 + 5 + 'px';
+                confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+                document.body.appendChild(confetti);
+                
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
+```
