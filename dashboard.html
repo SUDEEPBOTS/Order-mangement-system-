@@ -3,155 +3,373 @@
 <head>
     <title>Dashboard</title>
     <style>
+        :root {
+            --primary-color: #6e8efb;
+            --secondary-color: #a777e3;
+            --success-color: #4CAF50;
+            --danger-color: #f44336;
+            --info-color: #2196F3;
+        }
+        
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Poppins', sans-serif;
             padding: 20px;
             background-color: #f5f7fa;
             margin: 0;
-            animation: fadeIn 0.5s ease-in;
+            animation: fadeIn 0.8s ease-in;
         }
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        .welcome-message {
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
+        .welcome-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        .welcome-message::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to bottom right,
-                rgba(255,255,255,0.3),
-                rgba(255,255,255,0)
-            );
-            transform: rotate(30deg);
-            animation: shine 3s infinite;
-        }
-        @keyframes shine {
-            0% { transform: rotate(30deg) translate(-30%, -30%); }
-            100% { transform: rotate(30deg) translate(30%, 30%); }
-        }
-        
-        .stats-container {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-        .stat-box {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            min-width: 120px;
+            padding: 30px;
             text-align: center;
-            flex: 1;
-            transition: transform 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
-        .stat-box:hover {
-            transform: translateY(-5px);
-        }
-        .stat-box::before {
+        .welcome-container::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
-            height: 100%;
-            background: #4CAF50;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="rgba(255,255,255,0.05)" d="M0,0 L100,0 L100,100 L0,100 Z" /></svg>');
+            animation: shimmer 8s infinite linear;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .welcome-title {
+            font-size: 2.2rem;
+            margin: 0;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            animation: textGlow 2s infinite alternate;
+        }
+        @keyframes textGlow {
+            from { text-shadow: 0 0 5px rgba(255,255,255,0.3); }
+            to { text-shadow: 0 0 15px rgba(255,255,255,0.6); }
+        }
+        
+        .welcome-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 10px;
+            position: relative;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-top: 4px solid var(--primary-color);
+        }
+        .stat-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .stat-box h3 {
+            color: #555;
+            font-size: 0.9rem;
+            margin: 0 0 10px 0;
+        }
+        
+        .stat-box p {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        .stat-box.cancelled {
+            border-top-color: var(--danger-color);
+        }
+        .stat-box.cancelled p {
+            color: var(--danger-color);
+        }
+        
+        .stat-box.pending {
+            border-top-color: var(--info-color);
+            animation: pulseShadow 2s infinite;
+        }
+        .stat-box.pending p {
+            color: var(--info-color);
+        }
+        @keyframes pulseShadow {
+            0% { box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3); }
+            50% { box-shadow: 0 5px 25px rgba(33, 150, 243, 0.5); }
+            100% { box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3); }
         }
         
         .orders-container {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            animation: slideUp 0.5s ease-out;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            animation: slideUp 0.6s ease-out;
         }
         @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 25px;
+            background: var(--primary-color);
+            margin-right: 10px;
+            border-radius: 4px;
         }
         
         .order-card {
-            border-left: 4px solid #4CAF50;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background: #f9f9f9;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #fff;
             transition: all 0.3s ease;
             position: relative;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        .order-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(110,142,251,0.03), rgba(167,119,227,0.03));
+            z-index: 0;
         }
         .order-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transform: translateX(5px);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .order-card.cancelled {
+            border-left-color: var(--danger-color);
+        }
+        .order-card.delivered {
+            border-left-color: var(--success-color);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .order-id {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+        
+        .order-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-pending {
+            background-color: #e3f2fd;
+            color: var(--info-color);
+        }
+        .status-delivered {
+            background-color: #e8f5e9;
+            color: var(--success-color);
+        }
+        .status-cancelled {
+            background-color: #ffebee;
+            color: var(--danger-color);
+        }
+        
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .detail-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 0.8rem;
+            color: #777;
+            margin-bottom: 3px;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            position: relative;
+            z-index: 1;
         }
         
         .btn {
             padding: 10px 20px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
             transition: all 0.3s ease;
-            margin-right: 10px;
-            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
         }
-        .btn-success {
-            background: #4CAF50;
-            color: white;
-        }
-        .btn-danger {
-            background: #f44336;
-            color: white;
-        }
-        .btn-primary {
-            background: #2196F3;
-            color: white;
-        }
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        .btn i {
+            margin-right: 8px;
         }
         
-        .pulse {
-            animation: pulse 2s infinite;
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
         }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        .btn-primary:hover {
+            background: #5a7df9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(110,142,251,0.4);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        .btn-success:hover {
+            background: #3d8b40;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76,175,80,0.4);
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244,67,54,0.4);
+        }
+        
+        .btn-info {
+            background: var(--info-color);
+            color: white;
+        }
+        .btn-info:hover {
+            background: #0b7dda;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33,150,243,0.4);
         }
         
         .no-orders {
             text-align: center;
-            padding: 20px;
-            color: #666;
+            padding: 40px 20px;
+            color: #888;
             font-style: italic;
+            border: 2px dashed #eee;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* Confetti animation for order completion */
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            animation: confetti 3s ease-out forwards;
+            z-index: 1000;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .order-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .order-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="welcome-message">
-        <h1>Welcome back, <span id="userName"></span>!</h1>
-        <p>Manage your orders and track deliveries</p>
+    <div class="welcome-container">
+        <h1 class="welcome-title">Welcome to Order Management</h1>
+        <p class="welcome-subtitle">Efficiently track and manage all your orders</p>
     </div>
     
     <div class="stats-container">
@@ -159,32 +377,43 @@
             <h3>Today's Orders</h3>
             <p id="todayOrders">0</p>
         </div>
+        <div class="stat-box pending">
+            <h3>Pending Orders</h3>
+            <p id="pendingOrders">0</p>
+        </div>
         <div class="stat-box">
             <h3>Total Orders</h3>
             <p id="totalOrders">0</p>
         </div>
-        <div class="stat-box pulse">
-            <h3>Pending Orders</h3>
-            <p id="pendingOrders">0</p>
+        <div class="stat-box cancelled">
+            <h3>Cancelled Orders</h3>
+            <p id="cancelledOrders">0</p>
         </div>
     </div>
 
     <div class="orders-container">
-        <h2>Active Orders</h2>
+        <h2 class="section-title">Active Orders</h2>
         <div id="activeOrders">
-            <!-- Orders will load here -->
+            <!-- Active orders will be loaded here -->
         </div>
     </div>
 
-    <div>
+    <div class="orders-container">
+        <h2 class="section-title">Recent Activity</h2>
+        <div id="recentActivity">
+            <!-- Recent activity will be loaded here -->
+        </div>
+    </div>
+
+    <div class="action-buttons">
         <button class="btn btn-primary" onclick="window.location.href='new-order.html'">
-            ＋ Create New Order
+            <i class="fas fa-plus"></i> Create New Order
         </button>
-        <button class="btn btn-primary" onclick="window.location.href='order-history.html'">
-            📋 View Full History
+        <button class="btn btn-info" onclick="window.location.href='order-history.html'">
+            <i class="fas fa-history"></i> View Full History
         </button>
         <button class="btn btn-danger" onclick="logout()">
-            🚪 Logout
+            <i class="fas fa-sign-out-alt"></i> Logout
         </button>
     </div>
 
@@ -196,6 +425,13 @@
         // Load data when page opens
         document.addEventListener('DOMContentLoaded', function() {
             loadDashboardData();
+            
+            // Add animation to welcome container
+            const welcomeContainer = document.querySelector('.welcome-container');
+            welcomeContainer.style.animation = 'none';
+            setTimeout(() => {
+                welcomeContainer.style.animation = '';
+            }, 10);
         });
 
         function loadDashboardData() {
@@ -204,8 +440,6 @@
                 window.location.href = 'index.html';
                 return;
             }
-            
-            document.getElementById('userName').textContent = username;
 
             const appData = JSON.parse(localStorage.getItem('appData')) || { 
                 users: [],
@@ -217,35 +451,109 @@
                 return new Date(order.createdAt).toDateString() === new Date().toDateString();
             });
             const pendingOrders = userOrders.filter(order => order.status === 'In Progress');
+            const cancelledOrders = userOrders.filter(order => order.status === 'Cancelled');
+            const deliveredOrders = userOrders.filter(order => order.status === 'Delivered');
 
+            // Update stats
             document.getElementById('todayOrders').textContent = todayOrders.length;
             document.getElementById('totalOrders').textContent = userOrders.length;
             document.getElementById('pendingOrders').textContent = pendingOrders.length;
+            document.getElementById('cancelledOrders').textContent = cancelledOrders.length;
 
+            // Display active orders
             const activeOrdersContainer = document.getElementById('activeOrders');
             activeOrdersContainer.innerHTML = '';
             
             if (pendingOrders.length === 0) {
                 activeOrdersContainer.innerHTML = '<div class="no-orders">No active orders found</div>';
             } else {
-                pendingOrders.forEach(order => {
-                    const orderCard = document.createElement('div');
-                    orderCard.className = 'order-card';
-                    orderCard.innerHTML = `
-                        <p><strong>📦 Tracking #:</strong> ${order.trackingNumber}</p>
-                        <p><strong>🏠 Address:</strong> Tower ${order.towerNumber}, Flat ${order.flatNumber}</p>
-                        <p><strong>⏱️ Started:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
-                        <div style="margin-top: 15px;">
-                            <button class="btn btn-success" onclick="markDelivered('${order.trackingNumber}')">
-                                ✅ Mark Delivered
-                            </button>
-                            <button class="btn btn-danger" onclick="cancelOrder('${order.trackingNumber}')">
-                                ❌ Cancel Order
-                            </button>
-                        </div>
-                    `;
-                    activeOrdersContainer.appendChild(orderCard);
+                pendingOrders.slice(0, 3).forEach(order => {
+                    activeOrdersContainer.appendChild(createOrderCard(order, true));
                 });
+            }
+
+            // Display recent activity
+            const recentActivityContainer = document.getElementById('recentActivity');
+            recentActivityContainer.innerHTML = '';
+            
+            const recentOrders = [...userOrders]
+                .sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt))
+                .slice(0, 3);
+            
+            if (recentOrders.length === 0) {
+                recentActivityContainer.innerHTML = '<div class="no-orders">No recent activity</div>';
+            } else {
+                recentOrders.forEach(order => {
+                    recentActivityContainer.appendChild(createOrderCard(order, false));
+                });
+            }
+        }
+
+        function createOrderCard(order, showActions) {
+            const card = document.createElement('div');
+            card.className = `order-card ${order.status.toLowerCase()}`;
+            
+            const statusText = order.status === 'In Progress' ? 'Pending' : order.status;
+            const statusClass = `status-${order.status.toLowerCase().replace(' ', '-')}`;
+            
+            const updatedTime = order.updatedAt || order.createdAt;
+            const duration = order.status === 'Delivered' && order.duration ? 
+                order.duration : 
+                calculateDuration(order.createdAt);
+            
+            card.innerHTML = `
+                <div class="order-header">
+                    <span class="order-id">#${order.trackingNumber}</span>
+                    <span class="order-status ${statusClass}">${statusText}</span>
+                </div>
+                <div class="order-details">
+                    <div class="detail-group">
+                        <span class="detail-label"><i class="fas fa-building"></i> Address</span>
+                        <span class="detail-value">Tower ${order.towerNumber}, Flat ${order.flatNumber}</span>
+                    </div>
+                    <div class="detail-group">
+                        <span class="detail-label"><i class="fas fa-clock"></i> ${order.status === 'Delivered' ? 'Completed' : 'Started'}</span>
+                        <span class="detail-value">${new Date(order.createdAt).toLocaleString()}</span>
+                    </div>
+                    <div class="detail-group">
+                        <span class="detail-label"><i class="fas fa-stopwatch"></i> Duration</span>
+                        <span class="detail-value">${duration}</span>
+                    </div>
+                </div>
+            `;
+            
+            if (showActions && order.status === 'In Progress') {
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'order-actions';
+                actionsDiv.innerHTML = `
+                    <button class="btn btn-success" onclick="markDelivered('${order.trackingNumber}')">
+                        <i class="fas fa-check-circle"></i> Mark Delivered
+                    </button>
+                    <button class="btn btn-danger" onclick="cancelOrder('${order.trackingNumber}')">
+                        <i class="fas fa-times-circle"></i> Cancel Order
+                    </button>
+                `;
+                card.appendChild(actionsDiv);
+            }
+            
+            return card;
+        }
+
+        function calculateDuration(startTime) {
+            const start = new Date(startTime);
+            const now = new Date();
+            const diff = Math.floor((now - start) / 1000); // in seconds
+            
+            const hours = Math.floor(diff / 3600);
+            const minutes = Math.floor((diff % 3600) / 60);
+            const seconds = diff % 60;
+            
+            if (hours > 0) {
+                return `${hours}h ${minutes}m`;
+            } else if (minutes > 0) {
+                return `${minutes}m ${seconds}s`;
+            } else {
+                return `${seconds}s`;
             }
         }
 
@@ -256,63 +564,19 @@
             if (order) {
                 order.status = 'Delivered';
                 order.completedAt = new Date().toISOString();
+                order.updatedAt = new Date().toISOString();
                 
                 const start = new Date(order.createdAt);
                 const end = new Date();
                 const duration = Math.floor((end - start) / 1000);
-                order.duration = `${Math.floor(duration/60)} minutes`;
+                const hours = Math.floor(duration / 3600);
+                const minutes = Math.floor((duration % 3600) / 60);
+                order.duration = `${hours > 0 ? hours + 'h ' : ''}${minutes}m`;
                 
                 localStorage.setItem('appData', JSON.stringify(appData));
                 
                 // Send Telegram notification
                 sendTelegramNotification(
-                    `✅ Order Delivered\n\n` +
-                    `🆔 Tracking #: ${order.trackingNumber}\n` +
+                    `✅ ORDER DELIVERED\n\n` +
+                    `📦 Tracking #: ${order.trackingNumber}\n` +
                     `🏢 Tower/Flat: ${order.towerNumber}/${order.flatNumber}\n` +
-                    `⏱️ Duration: ${order.duration}`
-                );
-                
-                alert('Order marked as delivered!');
-                loadDashboardData();
-            }
-        }
-
-        function cancelOrder(trackingNumber) {
-            if (confirm('Are you sure you want to cancel this order?')) {
-                const appData = JSON.parse(localStorage.getItem('appData'));
-                const order = appData.allOrders.find(o => o.trackingNumber === trackingNumber);
-                
-                if (order) {
-                    order.status = 'Cancelled';
-                    order.cancelledAt = new Date().toISOString();
-                    localStorage.setItem('appData', JSON.stringify(appData));
-                    
-                    // Send Telegram notification
-                    sendTelegramNotification(
-                        `❌ Order Cancelled\n\n` +
-                        `🆔 Tracking #: ${order.trackingNumber}\n` +
-                        `🏢 Tower/Flat: ${order.towerNumber}/${order.flatNumber}\n` +
-                        `🕒 Cancelled At: ${new Date(order.cancelledAt).toLocaleString()}`
-                    );
-                    
-                    alert('Order cancelled successfully!');
-                    loadDashboardData();
-                }
-            }
-        }
-
-        function sendTelegramNotification(message) {
-            // Only send if credentials are configured
-            if (BOT_TOKEN && BOT_TOKEN !== 'YOUR_TELEGRAM_BOT_TOKEN' && 
-                CHAT_ID && CHAT_ID !== 'YOUR_TELEGRAM_CHAT_ID') {
-                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`);
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('currentUser');
-            window.location.href = 'index.html';
-        }
-    </script>
-</body>
-</html>
