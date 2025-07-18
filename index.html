@@ -3,70 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Order System Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #388E3C;
+            --accent-color: #8BC34A;
+            --light-bg: #f4f9f5;
+            --text-color: #333;
+            --light-text: #666;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            background-image: radial-gradient(circle at 10% 20%, rgba(139, 195, 74, 0.1) 0%, rgba(139, 195, 74, 0.05) 90%);
         }
+        
         .login-container {
             background: white;
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            width: 300px;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 380px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+        
+        .login-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+        
+        .welcome-message {
+            color: var(--primary-color);
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        h1 {
+            color: var(--text-color);
+            margin: 0 0 25px 0;
+            font-size: 28px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 3px;
+        }
+        
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: left;
+            position: relative;
         }
+        
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+            font-size: 14px;
         }
+        
         input {
             width: 100%;
-            padding: 8px;
+            padding: 12px 15px;
             box-sizing: border-box;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s ease;
         }
+        
+        input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139, 195, 74, 0.2);
+        }
+        
         button {
-            background-color: #4CAF50;
+            background-color: var(--primary-color);
             color: white;
-            padding: 10px 15px;
+            padding: 14px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             width: 100%;
             font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
+        
         button:hover {
-            background-color: #45a049;
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .user-hint {
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--light-text);
+        }
+        
+        .user-hint strong {
+            color: var(--secondary-color);
+        }
+        
+        .creator-credit {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px dashed #e0e0e0;
+            font-size: 12px;
+            color: var(--light-text);
+            position: relative;
+        }
+        
+        .creator-credit::before {
+            content: '★';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 0 10px;
+            color: var(--accent-color);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .login-container {
+                width: 90%;
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h1>Order System Login</h1>
-        <form id="loginForm">
+    <div class="login-container animate__animated animate__fadeIn animate__faster">
+        <div class="welcome-message animate__animated animate__fadeInDown">Welcome Back!</div>
+        <h1 class="animate__animated animate__fadeInDown animate__delay-1s">Order System Login</h1>
+        
+        <form id="loginForm" class="animate__animated animate__fadeIn animate__delay-2s">
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" required placeholder="Enter username">
+                <label for="username"><i class="fas fa-user"></i> Username</label>
+                <input type="text" id="username" required placeholder="Enter your username">
             </div>
-            <button type="submit">Login</button>
+            <button type="submit" class="pulse">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
         </form>
-        <p style="margin-top: 15px;">Use: <strong>sudeep1998</strong> or <strong>abss123</strong></p>
+        
+        <div class="user-hint animate__animated animate__fadeIn animate__delay-3s">
+            Try: <strong>sudeep1998</strong> or <strong>abss123</strong>
+        </div>
+        
+        <div class="creator-credit animate__animated animate__fadeInUp animate__delay-3s">
+            Created with ❤️ by Sudeep
+        </div>
     </div>
+
     <script>
-        // Simple Login Functionality
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -74,6 +218,11 @@
             const validUsers = ['sudeep1998', 'abss123'];
             
             if (validUsers.includes(username)) {
+                // Add loading animation
+                const btn = this.querySelector('button');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+                btn.disabled = true;
+                
                 // Create user object
                 const user = {
                     username: username,
@@ -81,12 +230,34 @@
                     orders: []
                 };
                 
-                // Save to localStorage and redirect
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                window.location.href = 'dashboard.html';
+                // Simulate network delay
+                setTimeout(() => {
+                    // Save to localStorage and redirect
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    window.location.href = 'dashboard.html';
+                }, 1000);
             } else {
+                // Add error animation
+                const input = document.getElementById('username');
+                input.style.borderColor = '#ff4444';
+                input.classList.add('animate__animated', 'animate__headShake');
+                
+                setTimeout(() => {
+                    input.style.borderColor = '#e0e0e0';
+                    input.classList.remove('animate__animated', 'animate__headShake');
+                }, 1000);
+                
                 alert('Invalid username. Only "sudeep1998" and "abss123" are allowed.');
             }
+        });
+        
+        // Add focus animation to input
+        document.getElementById('username').addEventListener('focus', function() {
+            this.parentNode.querySelector('label').style.color = 'var(--accent-color)';
+        });
+        
+        document.getElementById('username').addEventListener('blur', function() {
+            this.parentNode.querySelector('label').style.color = 'var(--secondary-color)';
         });
     </script>
 </body>
