@@ -1,45 +1,140 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Order</title>
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { font-family: Arial; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea { 
+            width: 100%; 
+            padding: 8px; 
+            box-sizing: border-box; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+        }
+        button { 
+            background: #4CAF50; 
+            color: white; 
+            padding: 10px 15px; 
+            border: none; 
+            cursor: pointer; 
+        }
+        #orderTimer { 
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 5px;
+        }
+        #timer { font-size: 24px; font-weight: bold; }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Create New Order</h1>
-        <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
-    </header>
+    <h1>Create New Order</h1>
+    <a href="dashboard.html" style="display: inline-block; margin-bottom: 20px;">← Back to Dashboard</a>
     
-    <main>
-        <form id="orderForm">
-            <div class="form-group">
-                <label for="towerNumber">Tower Number</label>
-                <input type="text" id="towerNumber" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="flatNumber">Flat Number</label>
-                <input type="text" id="flatNumber" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="orderDetails">Order Details</label>
-                <textarea id="orderDetails" rows="4" required></textarea>
-            </div>
-            
-            <button type="submit" class="btn">Submit Order</button>
-        </form>
-        
-        <div id="orderTimer" class="timer-container hidden">
-            <h3>Order in Progress</h3>
-            <p>Tracking Number: <span id="trackingNumber"></span></p>
-            <div class="timer">00:00:00</div>
-            <button id="completeOrderBtn" class="btn">Mark as Delivered</button>
+    <form id="orderForm">
+        <div class="form-group">
+            <label for="towerNumber">Tower Number</label>
+            <input type="text" id="towerNumber" required>
         </div>
-    </main>
+        
+        <div class="form-group">
+            <label for="flatNumber">Flat Number</label>
+            <input type="text" id="flatNumber" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="orderDetails">Order Details</label>
+            <textarea id="orderDetails" rows="4" required></textarea>
+        </div>
+        
+        <button type="submit">Submit Order</button>
+    </form>
     
-    <script src="js/script.js"></script>
+    <div id="orderTimer">
+        <h3>Order In Progress</h3>
+        <p>Tracking Number: <strong id="trackingNumber"></strong></p>
+        <div id="timer">00:00:00</div>
+        <button id="completeOrderBtn">Mark as Delivered</button>
+    </div>
+
+    <script>
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const towerNumber = document.getElementById('towerNumber').value;
+            const flatNumber = document.getElementById('flatNumber').value;
+            const orderDetails = document.getElementById('orderDetails').value;
+            
+            // Generate tracking number
+            const trackingNumber = 'TRK-' + Math.floor(100000 + Math.random() * 900000);
+            
+            // Create order object
+            const newOrder = {
+                towerNumber,
+                flatNumber,
+                orderDetails,
+                trackingNumber,
+                status: 'In Progress',
+                createdAt: new Date().toISOString(),
+                startTime: new Date().getTime(),
+                duration: null
+            };
+            
+            // Save to current user
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            user.orders = user.orders || [];
+            user.orders.push(newOrder);
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            // Update display
+            document.getElementById('orderForm').style.display = 'none';
+            document.getElementById('orderTimer').style.display = 'block';
+            document.getElementById('trackingNumber').textContent = trackingNumber;
+            
+            // Start timer
+            startTimer(newOrder.startTime);
+        });
+        
+        // Timer function
+        function startTimer(startTime) {
+            const timerElement = document.getElementById('timer');
+            
+            function updateTimer() {
+                const now = new Date().getTime();
+                const elapsed = Math.floor((now - startTime) / 1000);
+                
+                const hours = Math.floor(elapsed / 3600);
+                const minutes = Math.floor((elapsed % 3600) / 60);
+                const seconds = elapsed % 60;
+                
+                timerElement.textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            updateTimer();
+            const timerInterval = setInterval(updateTimer, 1000);
+            
+            // Complete order button
+            document.getElementById('completeOrderBtn').addEventListener('click', function() {
+                clearInterval(timerInterval);
+                
+                // Update order status
+                const user = JSON.parse(localStorage.getItem('currentUser'));
+                const lastOrder = user.orders[user.orders.length - 1];
+                const endTime = new Date().getTime();
+                
+                lastOrder.status = 'Delivered';
+                lastOrder.duration = Math.floor((endTime - lastOrder.startTime) / 1000) + ' seconds';
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                
+                alert('Order delivered successfully!');
+                window.location.href = 'dashboard.html';
+            });
+        }
+    </script>
 </body>
 </html>
