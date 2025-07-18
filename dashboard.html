@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome, <span id="userName"></span></h1>
+        <div class="stats">
+            <div class="stat-box">
+                <h3>Today's Orders</h3>
+                <p id="todayOrders">0</p>
+            </div>
+            <div class="stat-box">
+                <h3>Total Orders</h3>
+                <p id="totalOrders">0</p>
+            </div>
+        </div>
+    </header>
+    
+    <nav>
+        <button id="newOrderBtn" class="btn">Create New Order</button>
+        <button id="viewHistoryBtn" class="btn">View Order History</button>
+        <button id="logoutBtn" class="btn">Logout</button>
+    </nav>
+    
+    <script src="js/auth.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
