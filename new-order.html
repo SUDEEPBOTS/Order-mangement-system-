@@ -1,83 +1,515 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>New Order</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Order</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial; padding: 20px; max-width: 600px; margin: 0 auto; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, textarea { 
-            width: 100%; 
-            padding: 8px; 
-            box-sizing: border-box; 
-            border: 1px solid #ddd; 
-            border-radius: 4px; 
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2E7D32;
+            --accent-color: #8BC34A;
+            --light-bg: #f5f9f5;
+            --dark-text: #333;
+            --light-text: #666;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
         }
-        button { 
-            background: #4CAF50; 
-            color: white; 
-            padding: 10px 15px; 
-            border: none; 
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        #orderTimer, #orderComplete { 
-            display: none;
-            margin-top: 20px;
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
             padding: 20px;
-            background: #f8f8f8;
-            border-radius: 5px;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
         }
-        #timer { font-size: 24px; font-weight: bold; }
-        .order-details { margin: 15px 0; }
-        .order-details div { margin: 5px 0; }
-        .success-message { 
-            color: green;
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-bottom: 25px;
+            transition: var(--transition);
+        }
+        
+        .back-link:hover {
+            color: var(--secondary-color);
+            transform: translateX(-3px);
+        }
+        
+        .back-link i {
+            margin-right: 8px;
+        }
+        
+        h1 {
+            color: var(--secondary-color);
+            margin-bottom: 25px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: var(--transition);
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139, 195, 74, 0.2);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .btn-secondary {
+            background: #607D8B;
+        }
+        
+        .btn-secondary:hover {
+            background: #455A64;
+        }
+        
+        #orderTimer, #orderComplete {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .progress-container {
+            margin: 25px 0;
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e0e0e0;
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+        
+        .progress-bar {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 4px;
+            background: var(--primary-color);
+            z-index: 2;
+            transform: translateY(-50%);
+            transition: width 0.4s ease;
+        }
+        
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
             font-weight: bold;
-            margin: 15px 0;
+            position: relative;
+            z-index: 3;
+            transition: var(--transition);
+        }
+        
+        .step.active {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .step-label {
+            position: absolute;
+            top: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 14px;
+            color: var(--light-text);
+        }
+        
+        .step.active .step-label {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+        
+        #timer {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--secondary-color);
+            text-align: center;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .success-message {
+            color: var(--secondary-color);
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        .order-details {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .order-details div {
+            margin: 10px 0;
+            display: flex;
+        }
+        
+        .order-details strong {
+            min-width: 150px;
+            color: var(--light-text);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-group .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .animate-bounce {
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .delivery-person {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .delivery-person img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-color);
+            margin-bottom: 10px;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #FF5722;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .order-type-selector {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .order-type {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            background: #f0f0f0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .order-type:first-child {
+            border-right: 1px solid #ddd;
+        }
+        
+        .order-type.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .order-type i {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn-group .btn {
+                width: 100%;
+            }
+            
+            .order-details div {
+                flex-direction: column;
+            }
+            
+            .order-details strong {
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Create New Order</h1>
-    <a href="dashboard.html" style="display: inline-block; margin-bottom: 20px;">← Back to Dashboard</a>
+    <a href="dashboard.html" class="back-link animate__animated animate__fadeIn">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
     
-    <form id="orderForm">
-        <div class="form-group">
-            <label for="towerNumber">Tower Number</label>
-            <input type="text" id="towerNumber" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="flatNumber">Flat Number</label>
-            <input type="text" id="flatNumber" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="orderDetails">Order Details</label>
-            <textarea id="orderDetails" rows="4" required></textarea>
-        </div>
-        
-        <button type="submit">Submit Order</button>
-    </form>
+    <h1 class="animate__animated animate__fadeInDown">Create New Order</h1>
     
-    <div id="orderTimer">
-        <h3>Order In Progress</h3>
-        <p>Tracking Number: <strong id="trackingNumber"></strong></p>
+    <div class="card animate__animated animate__fadeIn">
+        <form id="orderForm">
+            <div class="order-type-selector">
+                <div class="order-type active" data-type="delivery">
+                    <i class="fas fa-truck"></i>
+                    Delivery
+                </div>
+                <div class="order-type" data-type="pickup">
+                    <i class="fas fa-store"></i>
+                    Pickup
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="towerNumber"><i class="fas fa-building"></i> Tower Number</label>
+                <select id="towerNumber" required>
+                    <option value="">Select Tower</option>
+                    <option value="Tower A">Tower A</option>
+                    <option value="Tower B">Tower B</option>
+                    <option value="Tower C">Tower C</option>
+                    <option value="Tower D">Tower D</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="flatNumber"><i class="fas fa-home"></i> Flat Number</label>
+                <input type="text" id="flatNumber" placeholder="e.g., 1204" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="orderType"><i class="fas fa-box"></i> Order Type</label>
+                <select id="orderType" required>
+                    <option value="">Select Order Type</option>
+                    <option value="Food">Food Delivery</option>
+                    <option value="Grocery">Grocery Delivery</option>
+                    <option value="Parcel">Parcel Delivery</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="orderDetails"><i class="fas fa-clipboard-list"></i> Order Details</label>
+                <textarea id="orderDetails" placeholder="Please provide detailed order information..." required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="specialInstructions"><i class="fas fa-star"></i> Special Instructions</label>
+                <textarea id="specialInstructions" placeholder="Any special delivery instructions?"></textarea>
+            </div>
+            
+            <button type="submit" class="btn animate__animated animate__pulse animate__infinite">
+                <i class="fas fa-paper-plane"></i> Submit Order
+            </button>
+        </form>
+    </div>
+    
+    <div id="orderTimer" class="card">
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="progress-bar" style="width: 33%;"></div>
+                <div class="step active">
+                    1
+                    <div class="step-label">Order Placed</div>
+                </div>
+                <div class="step">
+                    2
+                    <div class="step-label">Preparing</div>
+                </div>
+                <div class="step">
+                    3
+                    <div class="step-label">On the Way</div>
+                </div>
+                <div class="step">
+                    4
+                    <div class="step-label">Delivered</div>
+                </div>
+            </div>
+        </div>
+        
+        <h3><i class="fas fa-shipping-fast"></i> Order In Progress</h3>
+        
+        <div class="delivery-person">
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Delivery Person">
+            <h4>John D. is assigned to your order</h4>
+            <p>Rating: ★★★★☆ (4.2/5.0)</p>
+            <button class="btn btn-secondary" style="margin-top: 10px;">
+                <i class="fas fa-phone"></i> Contact Delivery
+            </button>
+        </div>
+        
+        <p>Tracking Number: <strong id="trackingNumber">TRK-456789</strong></p>
+        
         <div id="timer">00:00:00</div>
-        <button id="completeOrderBtn">Mark as Delivered</button>
+        
+        <div class="btn-group">
+            <button id="completeOrderBtn" class="btn">
+                <i class="fas fa-check-circle"></i> Mark as Delivered
+            </button>
+            <button id="cancelOrderBtn" class="btn btn-secondary">
+                <i class="fas fa-times-circle"></i> Cancel Order
+            </button>
+        </div>
     </div>
 
-    <div id="orderComplete">
-        <div class="success-message">✅ Order Successfully Completed!</div>
-        <div class="order-details">
-            <div><strong>Completion Time:</strong> <span id="completeTime"></span></div>
-            <div><strong>Delivery Address:</strong> Tower <span id="completeTower"></span>, Flat <span id="completeFlat"></span></div>
-            <div><strong>Tracking Number:</strong> <span id="completeTracking"></span></div>
-            <div><strong>Time Taken:</strong> <span id="completeDuration"></span></div>
+    <div id="orderComplete" class="card">
+        <div class="success-message animate__animated animate__bounceIn">
+            <i class="fas fa-check-circle animate-bounce"></i> Order Successfully Completed!
         </div>
-        <button onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
-        <button onclick="window.location.href='order-history.html'">View Order History</button>
+        
+        <div class="order-details">
+            <div><strong>Completion Time:</strong> <span id="completeTime">July 18, 2023 14:30</span></div>
+            <div><strong>Delivery Address:</strong> <span id="completeTower">Tower A</span>, Flat <span id="completeFlat">1204</span></div>
+            <div><strong>Tracking Number:</strong> <span id="completeTracking">TRK-456789</span></div>
+            <div><strong>Time Taken:</strong> <span id="completeDuration">0h 25m 42s</span></div>
+            <div><strong>Delivery Person:</strong> John D. (Rated: ★★★★☆)</div>
+        </div>
+        
+        <div class="btn-group">
+            <button onclick="window.location.href='dashboard.html'" class="btn">
+                <i class="fas fa-tachometer-alt"></i> Back to Dashboard
+            </button>
+            <button onclick="window.location.href='order-history.html'" class="btn btn-secondary">
+                <i class="fas fa-history"></i> View Order History
+            </button>
+            <button onclick="window.print()" class="btn btn-secondary">
+                <i class="fas fa-print"></i> Print Receipt
+            </button>
+        </div>
     </div>
 
     <script>
@@ -88,29 +520,46 @@
             }));
         }
 
+        // Order type selector
+        document.querySelectorAll('.order-type').forEach(type => {
+            type.addEventListener('click', function() {
+                document.querySelectorAll('.order-type').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             // Get form values
             const towerNumber = document.getElementById('towerNumber').value;
             const flatNumber = document.getElementById('flatNumber').value;
+            const orderType = document.getElementById('orderType').value;
             const orderDetails = document.getElementById('orderDetails').value;
+            const specialInstructions = document.getElementById('specialInstructions').value;
             
             // Generate tracking number
             const trackingNumber = 'TRK-' + Math.floor(100000 + Math.random() * 900000);
             
             // Create order object
             const newOrder = {
-                username: localStorage.getItem('currentUser'),
+                username: localStorage.getItem('currentUser') || 'Guest',
                 towerNumber,
                 flatNumber,
+                orderType,
                 orderDetails,
+                specialInstructions,
                 trackingNumber,
                 status: 'In Progress',
                 createdAt: new Date().toISOString(),
                 startTime: new Date().getTime(),
                 completedAt: null,
-                duration: null
+                duration: null,
+                deliveryPerson: {
+                    name: "John D.",
+                    photo: "https://randomuser.me/api/portraits/men/32.jpg",
+                    rating: 4.2
+                }
             };
             
             // Save to global storage
@@ -118,16 +567,47 @@
             appData.allOrders.push(newOrder);
             localStorage.setItem('appData', JSON.stringify(appData));
             
-            // Update display
-            document.getElementById('orderForm').style.display = 'none';
-            document.getElementById('orderTimer').style.display = 'block';
-            document.getElementById('trackingNumber').textContent = trackingNumber;
+            // Update display with animation
+            document.getElementById('orderForm').classList.add('animate__animated', 'animate__fadeOut');
             
-            // Start timer
-            startTimer(newOrder.startTime, trackingNumber);
+            setTimeout(() => {
+                document.getElementById('orderForm').style.display = 'none';
+                document.getElementById('orderTimer').style.display = 'block';
+                document.getElementById('trackingNumber').textContent = trackingNumber;
+                
+                // Start progress animation
+                animateProgress();
+                
+                // Start timer
+                startTimer(newOrder.startTime, trackingNumber);
+            }, 500);
         });
         
-        // Timer function
+        // Animate progress steps
+        function animateProgress() {
+            const steps = document.querySelectorAll('.step');
+            const progressBar = document.querySelector('.progress-bar');
+            let currentStep = 1;
+            
+            // Initial state
+            steps[0].classList.add('active');
+            
+            const progressInterval = setInterval(() => {
+                if (currentStep < steps.length) {
+                    steps[currentStep].classList.add('active');
+                    
+                    // Update progress bar width
+                    const width = ((currentStep + 1) / steps.length) * 100;
+                    progressBar.style.width = `${width}%`;
+                    
+                    currentStep++;
+                } else {
+                    clearInterval(progressInterval);
+                }
+            }, 3000);
+        }
+        
+               // Timer function
         function startTimer(startTime, trackingNumber) {
             const timerElement = document.getElementById('timer');
             let timerInterval;
@@ -170,15 +650,37 @@
                     appData.allOrders[orderIndex].duration = formattedDuration;
                     localStorage.setItem('appData', JSON.stringify(appData));
                     
-                    // Show completion details
+                    // Show completion details with animation
                     document.getElementById('orderTimer').style.display = 'none';
                     document.getElementById('orderComplete').style.display = 'block';
                     
-                    document.getElementById('completeTime').textContent = new Date().toLocaleString();
-                    document.getElementById('completeTower').textContent = appData.allOrders[orderIndex].towerNumber;
-                    document.getElementById('completeFlat').textContent = appData.allOrders[orderIndex].flatNumber;
+                    const order = appData.allOrders[orderIndex];
+                    document.getElementById('completeTime').textContent = new Date(order.completedAt).toLocaleString();
+                    document.getElementById('completeTower').textContent = order.towerNumber;
+                    document.getElementById('completeFlat').textContent = order.flatNumber;
                     document.getElementById('completeTracking').textContent = trackingNumber;
                     document.getElementById('completeDuration').textContent = formattedDuration;
+                }
+            });
+            
+            // Cancel order button
+            document.getElementById('cancelOrderBtn').addEventListener('click', function() {
+                if (confirm('Are you sure you want to cancel this order?')) {
+                    clearInterval(timerInterval);
+                    
+                    // Update order in global storage
+                    const appData = JSON.parse(localStorage.getItem('appData'));
+                    const orderIndex = appData.allOrders.findIndex(o => o.trackingNumber === trackingNumber);
+                    
+                    if (orderIndex !== -1) {
+                        appData.allOrders[orderIndex].status = 'Cancelled';
+                        appData.allOrders[orderIndex].completedAt = new Date().toISOString();
+                        localStorage.setItem('appData', JSON.stringify(appData));
+                        
+                        // Show message and redirect
+                        alert('Your order has been cancelled.');
+                        window.location.href = 'dashboard.html';
+                    }
                 }
             });
         }
