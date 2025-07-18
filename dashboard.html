@@ -1,33 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        h1 { color: #333; }
+        .btn { 
+            background: #4CAF50; 
+            color: white; 
+            padding: 10px 15px; 
+            border: none; 
+            margin: 5px;
+            cursor: pointer; 
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome, <span id="userName"></span></h1>
-        <div class="stats">
-            <div class="stat-box">
-                <h3>Today's Orders</h3>
-                <p id="todayOrders">0</p>
-            </div>
-            <div class="stat-box">
-                <h3>Total Orders</h3>
-                <p id="totalOrders">0</p>
-            </div>
-        </div>
-    </header>
-    
-    <nav>
-        <button id="newOrderBtn" class="btn">Create New Order</button>
-        <button id="viewHistoryBtn" class="btn">View Order History</button>
-        <button id="logoutBtn" class="btn">Logout</button>
-    </nav>
-    
-    <script src="js/auth.js"></script>
-    <script src="js/script.js"></script>
+    <h1>Welcome, <span id="userName"></span></h1>
+    <button onclick="window.location.href='new-order.html'">Create Order</button>
+    <button onclick="window.location.href='order-history.html'">View History</button>
+    <button onclick="logout()">Logout</button>
+
+    <script>
+        // Show current user
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user) window.location.href = 'index.html';
+        
+        document.getElementById('userName').textContent = user.name;
+        
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+    </script>
 </body>
 </html>
