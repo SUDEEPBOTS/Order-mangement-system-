@@ -4,20 +4,11 @@
     <title>Dashboard</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             padding: 20px;
             background-color: #f5f5f5;
-            margin: 0;
         }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-        }
-        .stats {
+        .stats-container {
             display: flex;
             gap: 15px;
             margin-bottom: 25px;
@@ -25,23 +16,12 @@
         }
         .stat-box {
             background: white;
-            padding: 15px 20px;
+            padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             min-width: 120px;
             text-align: center;
             flex: 1;
-        }
-        .stat-box h3 {
-            margin: 0 0 5px 0;
-            font-size: 14px;
-            color: #666;
-        }
-        .stat-box p {
-            margin: 0;
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
         }
         .orders-container {
             background: white;
@@ -50,98 +30,27 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
-        .orders-container h2 {
-            margin-top: 0;
-            color: #2c3e50;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
         .order-card {
-            border: 1px solid #eee;
-            border-radius: 6px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             padding: 15px;
             margin-bottom: 15px;
-            background: #fafafa;
-        }
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        .order-id {
-            font-weight: bold;
-            color: #3498db;
-        }
-        .order-status {
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .status-in-progress {
-            background: #fff3cd;
-            color: #856404;
-        }
-        .status-delivered {
-            background: #d4edda;
-            color: #155724;
-        }
-        .order-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .detail-label {
-            font-size: 12px;
-            color: #777;
-        }
-        .detail-value {
-            font-weight: bold;
-        }
-        .order-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
         }
         .btn {
             padding: 8px 15px;
+            background: #4CAF50;
+            color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-weight: bold;
-        }
-        .btn-primary {
-            background: #3498db;
-            color: white;
-        }
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .no-orders {
-            text-align: center;
-            color: #666;
-            padding: 20px;
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Welcome, <span id="userName"></span></h1>
-        <button class="btn btn-danger" onclick="logout()">Logout</button>
-    </div>
-
-    <div class="stats">
+    <h1>Welcome, <span id="userName"></span></h1>
+    
+    <div class="stats-container">
         <div class="stat-box">
             <h3>Today's Orders</h3>
             <p id="todayOrders">0</p>
@@ -159,90 +68,76 @@
     <div class="orders-container">
         <h2>Active Orders</h2>
         <div id="activeOrders">
-            <!-- Active orders will appear here -->
+            <!-- Orders will load here -->
         </div>
     </div>
 
-    <div class="btn-group">
-        <button class="btn btn-primary" onclick="window.location.href='new-order.html'">Create New Order</button>
-        <button class="btn btn-primary" onclick="window.location.href='order-history.html'">View Full History</button>
-    </div>
+    <button class="btn" onclick="window.location.href='new-order.html'">Create Order</button>
+    <button class="btn" onclick="window.location.href='order-history.html'">View History</button>
+    <button class="btn" onclick="logout()">Logout</button>
 
     <script>
-        // Load user data
-        const user = JSON.parse(localStorage.getItem('currentUser'));
-        if (!user) window.location.href = 'index.html';
-        document.getElementById('userName').textContent = user.name;
-
-        // Load order data
-        const appData = JSON.parse(localStorage.getItem('appData')) || { allOrders: [] };
-        const userOrders = appData.allOrders.filter(order => order.username === user.username);
-        
-        // Calculate stats
-        const todayOrders = userOrders.filter(order => {
-            return new Date(order.createdAt).toDateString() === new Date().toDateString();
+        // Load data when page opens
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
         });
-        const pendingOrders = userOrders.filter(order => order.status === 'In Progress');
 
-        // Update stats
-        document.getElementById('todayOrders').textContent = todayOrders.length;
-        document.getElementById('totalOrders').textContent = userOrders.length;
-        document.getElementById('pendingOrders').textContent = pendingOrders.length;
+        function loadDashboardData() {
+            // 1. Get current user
+            const username = localStorage.getItem('currentUser');
+            if (!username) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Display username
+            document.getElementById('userName').textContent = username;
 
-        // Display active orders
-        const activeOrdersContainer = document.getElementById('activeOrders');
-        if (pendingOrders.length > 0) {
-            pendingOrders.forEach(order => {
-                activeOrdersContainer.appendChild(createOrderCard(order));
+            // 2. Load all app data
+            const appData = JSON.parse(localStorage.getItem('appData')) || { 
+                users: [],
+                allOrders: [] 
+            };
+
+            // 3. Filter orders for current user
+            const userOrders = appData.allOrders.filter(order => order.username === username);
+            
+            // 4. Calculate today's orders (compare dates)
+            const todayOrders = userOrders.filter(order => {
+                const orderDate = new Date(order.createdAt).toDateString();
+                const today = new Date().toDateString();
+                return orderDate === today;
             });
-        } else {
-            activeOrdersContainer.innerHTML = '<div class="no-orders">No active orders found</div>';
-        }
 
-        // Create order card element
-        function createOrderCard(order) {
-            const card = document.createElement('div');
-            card.className = 'order-card';
+            // 5. Calculate pending orders
+            const pendingOrders = userOrders.filter(order => order.status === 'In Progress');
+
+            // 6. Update the dashboard numbers
+            document.getElementById('todayOrders').textContent = todayOrders.length;
+            document.getElementById('totalOrders').textContent = userOrders.length;
+            document.getElementById('pendingOrders').textContent = pendingOrders.length;
+
+            // 7. Display active orders
+            const activeOrdersContainer = document.getElementById('activeOrders');
+            activeOrdersContainer.innerHTML = ''; // Clear previous content
             
-            card.innerHTML = `
-                <div class="order-header">
-                    <span class="order-id">${order.trackingNumber}</span>
-                    <span class="order-status status-in-progress">In Progress</span>
-                </div>
-                <div class="order-details">
-                    <div>
-                        <div class="detail-label">Tower/Flat</div>
-                        <div class="detail-value">${order.towerNumber}/${order.flatNumber}</div>
-                    </div>
-                    <div>
-                        <div class="detail-label">Started At</div>
-                        <div class="detail-value">${new Date(order.createdAt).toLocaleString()}</div>
-                    </div>
-                    <div>
-                        <div class="detail-label">Duration</div>
-                        <div class="detail-value">${calculateDuration(order.startTime)}</div>
-                    </div>
-                </div>
-                <div class="order-actions">
-                    <button class="btn btn-success" onclick="markDelivered('${order.trackingNumber}')">Mark Delivered</button>
-                    <button class="btn btn-danger" onclick="cancelOrder('${order.trackingNumber}')">Cancel Order</button>
-                </div>
-            `;
-            
-            return card;
+            if (pendingOrders.length === 0) {
+                activeOrdersContainer.innerHTML = '<p>No active orders found</p>';
+            } else {
+                pendingOrders.forEach(order => {
+                    const orderCard = document.createElement('div');
+                    orderCard.className = 'order-card';
+                    orderCard.innerHTML = `
+                        <p><strong>Tracking #:</strong> ${order.trackingNumber}</p>
+                        <p><strong>Address:</strong> Tower ${order.towerNumber}, Flat ${order.flatNumber}</p>
+                        <p><strong>Started:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
+                        <button onclick="markDelivered('${order.trackingNumber}')">Mark Delivered</button>
+                    `;
+                    activeOrdersContainer.appendChild(orderCard);
+                });
+            }
         }
 
-        // Calculate duration for display
-        function calculateDuration(startTime) {
-            if (!startTime) return 'Just started';
-            const seconds = Math.floor((new Date().getTime() - startTime) / 1000);
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            const secs = seconds % 60;
-            return `${hours}h ${minutes}m ${secs}s`;
-        }
-
-        // Mark order as delivered
         function markDelivered(trackingNumber) {
             const appData = JSON.parse(localStorage.getItem('appData'));
             const order = appData.allOrders.find(o => o.trackingNumber === trackingNumber);
@@ -250,29 +145,19 @@
             if (order) {
                 order.status = 'Delivered';
                 order.completedAt = new Date().toISOString();
-                order.duration = calculateDuration(order.startTime);
+                
+                // Calculate duration
+                const start = new Date(order.createdAt);
+                const end = new Date();
+                const duration = Math.floor((end - start) / 1000); // in seconds
+                order.duration = `${Math.floor(duration/60)} minutes`;
+                
                 localStorage.setItem('appData', JSON.stringify(appData));
                 alert('Order marked as delivered!');
-                window.location.reload();
+                loadDashboardData(); // Refresh the dashboard
             }
         }
 
-        // Cancel order
-        function cancelOrder(trackingNumber) {
-            if (confirm('Are you sure you want to cancel this order?')) {
-                const appData = JSON.parse(localStorage.getItem('appData'));
-                const order = appData.allOrders.find(o => o.trackingNumber === trackingNumber);
-                
-                if (order) {
-                    order.status = 'Cancelled';
-                    localStorage.setItem('appData', JSON.stringify(appData));
-                    alert('Order cancelled!');
-                    window.location.reload();
-                }
-            }
-        }
-
-        // Logout function
         function logout() {
             localStorage.removeItem('currentUser');
             window.location.href = 'index.html';
