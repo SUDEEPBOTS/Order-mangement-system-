@@ -285,68 +285,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .delivery-person {
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .delivery-person img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--accent-color);
-            margin-bottom: 10px;
-        }
-        
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #FF5722;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .order-type-selector {
-            display: flex;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-        
-        .order-type {
-            flex: 1;
-            text-align: center;
-            padding: 12px;
-            background: #f0f0f0;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        
-        .order-type:first-child {
-            border-right: 1px solid #ddd;
-        }
-        
-        .order-type.active {
-            background: var(--primary-color);
-            color: white;
-        }
-        
-        .order-type i {
-            display: block;
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-        
         /* Responsive adjustments */
         @media (max-width: 600px) {
             body {
@@ -384,25 +322,26 @@
     
     <div class="card animate__animated animate__fadeIn">
         <form id="orderForm">
-            <div class="order-type-selector">
-                <div class="order-type active" data-type="delivery">
-                    <i class="fas fa-truck"></i>
-                    Delivery
-                </div>
-                <div class="order-type" data-type="pickup">
-                    <i class="fas fa-store"></i>
-                    Pickup
-                </div>
-            </div>
-            
             <div class="form-group">
                 <label for="towerNumber"><i class="fas fa-building"></i> Tower Number</label>
                 <select id="towerNumber" required>
-                    <option value="">Select Tower</option>
-                    <option value="Tower A">Tower A</option>
-                    <option value="Tower B">Tower B</option>
-                    <option value="Tower C">Tower C</option>
-                    <option value="Tower D">Tower D</option>
+                    <option value="">Select Tower Number</option>
+                    <option value="1">Tower 1</option>
+                    <option value="2">Tower 2</option>
+                    <option value="3">Tower 3</option>
+                    <option value="4">Tower 4</option>
+                    <option value="5">Tower 5</option>
+                    <option value="6">Tower 6</option>
+                    <option value="7">Tower 7</option>
+                    <option value="8">Tower 8</option>
+                    <option value="9">Tower 9</option>
+                    <option value="10">Tower 10</option>
+                    <option value="11">Tower 11</option>
+                    <option value="12">Tower 12</option>
+                    <option value="13">Tower 13</option>
+                    <option value="14">Tower 14</option>
+                    <option value="15">Tower 15</option>
+                    <option value="16">Tower 16</option>
                 </select>
             </div>
             
@@ -412,24 +351,8 @@
             </div>
             
             <div class="form-group">
-                <label for="orderType"><i class="fas fa-box"></i> Order Type</label>
-                <select id="orderType" required>
-                    <option value="">Select Order Type</option>
-                    <option value="Food">Food Delivery</option>
-                    <option value="Grocery">Grocery Delivery</option>
-                    <option value="Parcel">Parcel Delivery</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
                 <label for="orderDetails"><i class="fas fa-clipboard-list"></i> Order Details</label>
-                <textarea id="orderDetails" placeholder="Please provide detailed order information..." required></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="specialInstructions"><i class="fas fa-star"></i> Special Instructions</label>
-                <textarea id="specialInstructions" placeholder="Any special delivery instructions?"></textarea>
+                <textarea id="orderDetails" placeholder="Please enter your order details..." required></textarea>
             </div>
             
             <button type="submit" class="btn animate__animated animate__pulse animate__infinite">
@@ -463,14 +386,7 @@
         
         <h3><i class="fas fa-shipping-fast"></i> Order In Progress</h3>
         
-        <div class="delivery-person">
-            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Delivery Person">
-            <h4>John D. is assigned to your order</h4>
-            <p>Rating: ★★★★☆ (4.2/5.0)</p>
-            <button class="btn btn-secondary" style="margin-top: 10px;">
-                <i class="fas fa-phone"></i> Contact Delivery
-            </button>
-        </div>
+        <p>Your order has been received and is being processed. A bot has been notified to handle your request.</p>
         
         <p>Tracking Number: <strong id="trackingNumber">TRK-456789</strong></p>
         
@@ -493,10 +409,9 @@
         
         <div class="order-details">
             <div><strong>Completion Time:</strong> <span id="completeTime">July 18, 2023 14:30</span></div>
-            <div><strong>Delivery Address:</strong> <span id="completeTower">Tower A</span>, Flat <span id="completeFlat">1204</span></div>
+            <div><strong>Delivery Address:</strong> Tower <span id="completeTower">1</span>, Flat <span id="completeFlat">1204</span></div>
             <div><strong>Tracking Number:</strong> <span id="completeTracking">TRK-456789</span></div>
             <div><strong>Time Taken:</strong> <span id="completeDuration">0h 25m 42s</span></div>
-            <div><strong>Delivery Person:</strong> John D. (Rated: ★★★★☆)</div>
         </div>
         
         <div class="btn-group">
@@ -505,9 +420,6 @@
             </button>
             <button onclick="window.location.href='order-history.html'" class="btn btn-secondary">
                 <i class="fas fa-history"></i> View Order History
-            </button>
-            <button onclick="window.print()" class="btn btn-secondary">
-                <i class="fas fa-print"></i> Print Receipt
             </button>
         </div>
     </div>
@@ -520,23 +432,13 @@
             }));
         }
 
-        // Order type selector
-        document.querySelectorAll('.order-type').forEach(type => {
-            type.addEventListener('click', function() {
-                document.querySelectorAll('.order-type').forEach(t => t.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             // Get form values
             const towerNumber = document.getElementById('towerNumber').value;
             const flatNumber = document.getElementById('flatNumber').value;
-            const orderType = document.getElementById('orderType').value;
             const orderDetails = document.getElementById('orderDetails').value;
-            const specialInstructions = document.getElementById('specialInstructions').value;
             
             // Generate tracking number
             const trackingNumber = 'TRK-' + Math.floor(100000 + Math.random() * 900000);
@@ -546,26 +448,23 @@
                 username: localStorage.getItem('currentUser') || 'Guest',
                 towerNumber,
                 flatNumber,
-                orderType,
                 orderDetails,
-                specialInstructions,
                 trackingNumber,
                 status: 'In Progress',
                 createdAt: new Date().toISOString(),
                 startTime: new Date().getTime(),
                 completedAt: null,
                 duration: null,
-                deliveryPerson: {
-                    name: "John D.",
-                    photo: "https://randomuser.me/api/portraits/men/32.jpg",
-                    rating: 4.2
-                }
+                botNotified: true
             };
             
             // Save to global storage
             const appData = JSON.parse(localStorage.getItem('appData'));
             appData.allOrders.push(newOrder);
             localStorage.setItem('appData', JSON.stringify(appData));
+            
+            // Notify bot (simulated)
+            notifyBot(newOrder);
             
             // Update display with animation
             document.getElementById('orderForm').classList.add('animate__animated', 'animate__fadeOut');
@@ -582,6 +481,13 @@
                 startTimer(newOrder.startTime, trackingNumber);
             }, 500);
         });
+        
+        // Function to simulate bot notification
+        function notifyBot(order) {
+            console.log(`Bot notified about new order: ${order.trackingNumber}`);
+            // In a real implementation, this would send a request to your backend
+            // to notify the bot about the new order
+        }
         
         // Animate progress steps
         function animateProgress() {
@@ -607,7 +513,7 @@
             }, 3000);
         }
         
-               // Timer function
+        // Timer function
         function startTimer(startTime, trackingNumber) {
             const timerElement = document.getElementById('timer');
             let timerInterval;
@@ -663,7 +569,7 @@
                 }
             });
             
-            // Cancel order button
+                    // Cancel order button
             document.getElementById('cancelOrderBtn').addEventListener('click', function() {
                 if (confirm('Are you sure you want to cancel this order?')) {
                     clearInterval(timerInterval);
@@ -687,3 +593,4 @@
     </script>
 </body>
 </html>
+```
