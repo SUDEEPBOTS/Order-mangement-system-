@@ -4,10 +4,47 @@
     <title>Dashboard</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #f5f7fa;
+            margin: 0;
+            animation: fadeIn 0.5s ease-in;
         }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .welcome-message {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .welcome-message::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255,255,255,0.3),
+                rgba(255,255,255,0)
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            0% { transform: rotate(30deg) translate(-30%, -30%); }
+            100% { transform: rotate(30deg) translate(30%, 30%); }
+        }
+        
         .stats-container {
             display: flex;
             gap: 15px;
@@ -16,39 +53,106 @@
         }
         .stat-box {
             background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             min-width: 120px;
             text-align: center;
             flex: 1;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+        .stat-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #4CAF50;
+        }
+        
         .orders-container {
             background: white;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             margin-bottom: 20px;
+            animation: slideUp 0.5s ease-out;
         }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
         .order-card {
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+            border-radius: 6px;
             padding: 15px;
             margin-bottom: 15px;
+            background: #f9f9f9;
+            transition: all 0.3s ease;
+            position: relative;
         }
+        .order-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+        
         .btn {
-            padding: 8px 15px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn-success {
             background: #4CAF50;
             color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-right: 10px;
+        }
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+        
+        .no-orders {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome, <span id="userName"></span></h1>
+    <div class="welcome-message">
+        <h1>Welcome back, <span id="userName"></span>!</h1>
+        <p>Manage your orders and track deliveries</p>
+    </div>
     
     <div class="stats-container">
         <div class="stat-box">
@@ -59,8 +163,8 @@
             <h3>Total Orders</h3>
             <p id="totalOrders">0</p>
         </div>
-        <div class="stat-box">
-            <h3>Pending</h3>
+        <div class="stat-box pulse">
+            <h3>Pending Orders</h3>
             <p id="pendingOrders">0</p>
         </div>
     </div>
@@ -72,66 +176,73 @@
         </div>
     </div>
 
-    <button class="btn" onclick="window.location.href='new-order.html'">Create Order</button>
-    <button class="btn" onclick="window.location.href='order-history.html'">View History</button>
-    <button class="btn" onclick="logout()">Logout</button>
+    <div>
+        <button class="btn btn-primary" onclick="window.location.href='new-order.html'">
+            ＋ Create New Order
+        </button>
+        <button class="btn btn-primary" onclick="window.location.href='order-history.html'">
+            📋 View Full History
+        </button>
+        <button class="btn btn-danger" onclick="logout()">
+            🚪 Logout
+        </button>
+    </div>
 
     <script>
+        // Telegram Bot Configuration
+        const BOT_TOKEN = '7454405706:AAGoeV3DkS7ubUDaR8YPlbinXHWJ8fqFhPY';
+        const CHAT_ID = '-1002679633553';
+        
         // Load data when page opens
         document.addEventListener('DOMContentLoaded', function() {
             loadDashboardData();
         });
 
         function loadDashboardData() {
-            // 1. Get current user
             const username = localStorage.getItem('currentUser');
             if (!username) {
                 window.location.href = 'index.html';
                 return;
             }
             
-            // Display username
             document.getElementById('userName').textContent = username;
 
-            // 2. Load all app data
             const appData = JSON.parse(localStorage.getItem('appData')) || { 
                 users: [],
                 allOrders: [] 
             };
 
-            // 3. Filter orders for current user
             const userOrders = appData.allOrders.filter(order => order.username === username);
-            
-            // 4. Calculate today's orders (compare dates)
             const todayOrders = userOrders.filter(order => {
-                const orderDate = new Date(order.createdAt).toDateString();
-                const today = new Date().toDateString();
-                return orderDate === today;
+                return new Date(order.createdAt).toDateString() === new Date().toDateString();
             });
-
-            // 5. Calculate pending orders
             const pendingOrders = userOrders.filter(order => order.status === 'In Progress');
 
-            // 6. Update the dashboard numbers
             document.getElementById('todayOrders').textContent = todayOrders.length;
             document.getElementById('totalOrders').textContent = userOrders.length;
             document.getElementById('pendingOrders').textContent = pendingOrders.length;
 
-            // 7. Display active orders
             const activeOrdersContainer = document.getElementById('activeOrders');
-            activeOrdersContainer.innerHTML = ''; // Clear previous content
+            activeOrdersContainer.innerHTML = '';
             
             if (pendingOrders.length === 0) {
-                activeOrdersContainer.innerHTML = '<p>No active orders found</p>';
+                activeOrdersContainer.innerHTML = '<div class="no-orders">No active orders found</div>';
             } else {
                 pendingOrders.forEach(order => {
                     const orderCard = document.createElement('div');
                     orderCard.className = 'order-card';
                     orderCard.innerHTML = `
-                        <p><strong>Tracking #:</strong> ${order.trackingNumber}</p>
-                        <p><strong>Address:</strong> Tower ${order.towerNumber}, Flat ${order.flatNumber}</p>
-                        <p><strong>Started:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
-                        <button onclick="markDelivered('${order.trackingNumber}')">Mark Delivered</button>
+                        <p><strong>📦 Tracking #:</strong> ${order.trackingNumber}</p>
+                        <p><strong>🏠 Address:</strong> Tower ${order.towerNumber}, Flat ${order.flatNumber}</p>
+                        <p><strong>⏱️ Started:</strong> ${new Date(order.createdAt).toLocaleString()}</p>
+                        <div style="margin-top: 15px;">
+                            <button class="btn btn-success" onclick="markDelivered('${order.trackingNumber}')">
+                                ✅ Mark Delivered
+                            </button>
+                            <button class="btn btn-danger" onclick="cancelOrder('${order.trackingNumber}')">
+                                ❌ Cancel Order
+                            </button>
+                        </div>
                     `;
                     activeOrdersContainer.appendChild(orderCard);
                 });
@@ -146,15 +257,55 @@
                 order.status = 'Delivered';
                 order.completedAt = new Date().toISOString();
                 
-                // Calculate duration
                 const start = new Date(order.createdAt);
                 const end = new Date();
-                const duration = Math.floor((end - start) / 1000); // in seconds
+                const duration = Math.floor((end - start) / 1000);
                 order.duration = `${Math.floor(duration/60)} minutes`;
                 
                 localStorage.setItem('appData', JSON.stringify(appData));
+                
+                // Send Telegram notification
+                sendTelegramNotification(
+                    `✅ Order Delivered\n\n` +
+                    `🆔 Tracking #: ${order.trackingNumber}\n` +
+                    `🏢 Tower/Flat: ${order.towerNumber}/${order.flatNumber}\n` +
+                    `⏱️ Duration: ${order.duration}`
+                );
+                
                 alert('Order marked as delivered!');
-                loadDashboardData(); // Refresh the dashboard
+                loadDashboardData();
+            }
+        }
+
+        function cancelOrder(trackingNumber) {
+            if (confirm('Are you sure you want to cancel this order?')) {
+                const appData = JSON.parse(localStorage.getItem('appData'));
+                const order = appData.allOrders.find(o => o.trackingNumber === trackingNumber);
+                
+                if (order) {
+                    order.status = 'Cancelled';
+                    order.cancelledAt = new Date().toISOString();
+                    localStorage.setItem('appData', JSON.stringify(appData));
+                    
+                    // Send Telegram notification
+                    sendTelegramNotification(
+                        `❌ Order Cancelled\n\n` +
+                        `🆔 Tracking #: ${order.trackingNumber}\n` +
+                        `🏢 Tower/Flat: ${order.towerNumber}/${order.flatNumber}\n` +
+                        `🕒 Cancelled At: ${new Date(order.cancelledAt).toLocaleString()}`
+                    );
+                    
+                    alert('Order cancelled successfully!');
+                    loadDashboardData();
+                }
+            }
+        }
+
+        function sendTelegramNotification(message) {
+            // Only send if credentials are configured
+            if (BOT_TOKEN && BOT_TOKEN !== 'YOUR_TELEGRAM_BOT_TOKEN' && 
+                CHAT_ID && CHAT_ID !== 'YOUR_TELEGRAM_CHAT_ID') {
+                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`);
             }
         }
 
