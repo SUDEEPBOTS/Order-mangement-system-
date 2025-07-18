@@ -18,16 +18,24 @@
             color: white; 
             padding: 10px 15px; 
             border: none; 
-            cursor: pointer; 
+            cursor: pointer;
+            margin-top: 10px;
         }
-        #orderTimer { 
+        #orderTimer, #orderComplete { 
             display: none;
             margin-top: 20px;
-            padding: 15px;
+            padding: 20px;
             background: #f8f8f8;
             border-radius: 5px;
         }
         #timer { font-size: 24px; font-weight: bold; }
+        .order-details { margin: 15px 0; }
+        .order-details div { margin: 5px 0; }
+        .success-message { 
+            color: green;
+            font-weight: bold;
+            margin: 15px 0;
+        }
     </style>
 </head>
 <body>
@@ -60,7 +68,26 @@
         <button id="completeOrderBtn">Mark as Delivered</button>
     </div>
 
+    <div id="orderComplete">
+        <div class="success-message">✅ Order Successfully Completed!</div>
+        <div class="order-details">
+            <div><strong>Completion Time:</strong> <span id="completeTime"></span></div>
+            <div><strong>Delivery Address:</strong> Tower <span id="completeTower"></span>, Flat <span id="completeFlat"></span></div>
+            <div><strong>Tracking Number:</strong> <span id="completeTracking"></span></div>
+            <div><strong>Time Taken:</strong> <span id="completeDuration"></span></div>
+        </div>
+        <button onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+        <button onclick="window.location.href='order-history.html'">View Order History</button>
+    </div>
+
     <script>
+        // Initialize app data if not exists
+        if (!localStorage.getItem('appData')) {
+            localStorage.setItem('appData', JSON.stringify({
+                allOrders: []
+            }));
+        }
+
         document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -74,6 +101,7 @@
             
             // Create order object
             const newOrder = {
+                username: localStorage.getItem('currentUser'),
                 towerNumber,
                 flatNumber,
                 orderDetails,
@@ -81,14 +109,14 @@
                 status: 'In Progress',
                 createdAt: new Date().toISOString(),
                 startTime: new Date().getTime(),
+                completedAt: null,
                 duration: null
             };
             
-            // Save to current user
-            const user = JSON.parse(localStorage.getItem('currentUser'));
-            user.orders = user.orders || [];
-            user.orders.push(newOrder);
-            localStorage.setItem('currentUser', JSON.stringify(user));
+            // Save to global storage
+            const appData = JSON.parse(localStorage.getItem('appData'));
+            appData.allOrders.push(newOrder);
+            localStorage.setItem('appData', JSON.stringify(appData));
             
             // Update display
             document.getElementById('orderForm').style.display = 'none';
@@ -96,12 +124,13 @@
             document.getElementById('trackingNumber').textContent = trackingNumber;
             
             // Start timer
-            startTimer(newOrder.startTime);
+            startTimer(newOrder.startTime, trackingNumber);
         });
         
         // Timer function
-        function startTimer(startTime) {
+        function startTimer(startTime, trackingNumber) {
             const timerElement = document.getElementById('timer');
+            let timerInterval;
             
             function updateTimer() {
                 const now = new Date().getTime();
@@ -116,23 +145,41 @@
             }
             
             updateTimer();
-            const timerInterval = setInterval(updateTimer, 1000);
+            timerInterval = setInterval(updateTimer, 1000);
             
             // Complete order button
             document.getElementById('completeOrderBtn').addEventListener('click', function() {
                 clearInterval(timerInterval);
                 
-                // Update order status
-                const user = JSON.parse(localStorage.getItem('currentUser'));
-                const lastOrder = user.orders[user.orders.length - 1];
                 const endTime = new Date().getTime();
+                const durationSeconds = Math.floor((endTime - startTime) / 1000);
                 
-                lastOrder.status = 'Delivered';
-                lastOrder.duration = Math.floor((endTime - lastOrder.startTime) / 1000) + ' seconds';
-                localStorage.setItem('currentUser', JSON.stringify(user));
+                // Format duration
+                const hours = Math.floor(durationSeconds / 3600);
+                const minutes = Math.floor((durationSeconds % 3600) / 60);
+                const seconds = durationSeconds % 60;
+                const formattedDuration = `${hours}h ${minutes}m ${seconds}s`;
                 
-                alert('Order delivered successfully!');
-                window.location.href = 'dashboard.html';
+                // Update order in global storage
+                const appData = JSON.parse(localStorage.getItem('appData'));
+                const orderIndex = appData.allOrders.findIndex(o => o.trackingNumber === trackingNumber);
+                
+                if (orderIndex !== -1) {
+                    appData.allOrders[orderIndex].status = 'Delivered';
+                    appData.allOrders[orderIndex].completedAt = new Date().toISOString();
+                    appData.allOrders[orderIndex].duration = formattedDuration;
+                    localStorage.setItem('appData', JSON.stringify(appData));
+                    
+                    // Show completion details
+                    document.getElementById('orderTimer').style.display = 'none';
+                    document.getElementById('orderComplete').style.display = 'block';
+                    
+                    document.getElementById('completeTime').textContent = new Date().toLocaleString();
+                    document.getElementById('completeTower').textContent = appData.allOrders[orderIndex].towerNumber;
+                    document.getElementById('completeFlat').textContent = appData.allOrders[orderIndex].flatNumber;
+                    document.getElementById('completeTracking').textContent = trackingNumber;
+                    document.getElementById('completeDuration').textContent = formattedDuration;
+                }
             });
         }
     </script>
