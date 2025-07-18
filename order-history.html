@@ -4,22 +4,73 @@
     <title>Order History</title>
     <style>
         body { font-family: Arial; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #4CAF50; color: white; }
-        tr:hover { background-color: #f5f5f5; }
-        .In-Progress { color: orange; }
-        .Delivered { color: green; }
+        h1 { color: #333; margin-bottom: 20px; }
+        .back-link {
+            display: inline-block; 
+            margin-bottom: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+        th, td { 
+            padding: 12px 15px; 
+            text-align: left; 
+            border-bottom: 1px solid #ddd; 
+        }
+        th { 
+            background-color: #4CAF50; 
+            color: white; 
+            position: sticky;
+            top: 0;
+        }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
+        .In-Progress { color: orange; font-weight: bold; }
+        .Delivered { color: green; font-weight: bold; }
+        .no-orders {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .filter-controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        select, input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
     <h1>Order History</h1>
-    <a href="dashboard.html" style="display: inline-block; margin-bottom: 20px;">← Back to Dashboard</a>
+    <a href="dashboard.html" class="back-link">← Back to Dashboard</a>
+    
+    <div class="filter-controls">
+        <label for="filterStatus">Filter by Status:</label>
+        <select id="filterStatus">
+            <option value="all">All Orders</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Delivered">Delivered</option>
+        </select>
+        
+        <label for="search">Search:</label>
+        <input type="text" id="search" placeholder="Tower/Flat or Tracking #">
+    </div>
     
     <table id="orderTable">
         <thead>
             <tr>
-                <th>Date</th>
+                <th>Date/Time</th>
                 <th>Tracking #</th>
                 <th>Address</th>
                 <th>Duration</th>
@@ -33,34 +84,73 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const currentUser = localStorage.getItem('currentUser');
+            const appData = JSON.parse(localStorage.getItem('appData')) || { allOrders: [] };
             
-            if (!user || !user.orders) {
-                document.querySelector('tbody').innerHTML = 
-                    '<tr><td colspan="5">No orders found</td></tr>';
-                return;
-            }
+            // Filter orders for current user
+            let userOrders = appData.allOrders.filter(order => order.username === currentUser);
             
-            const tbody = document.querySelector('tbody');
-            tbody.innerHTML = '';
+            // Display all orders initially
+            displayOrders(userOrders);
             
-            user.orders.forEach(order => {
-                const row = document.createElement('tr');
+            // Filter by status
+            document.getElementById('filterStatus').addEventListener('change', function() {
+                const status = this.value;
+                let filteredOrders = userOrders;
                 
-                const date = new Date(order.createdAt).toLocaleString();
-                const address = `${order.towerNumber}/${order.flatNumber}`;
-                const statusClass = order.status.replace(' ', '-');
+                if (status !== 'all') {
+                    filteredOrders = userOrders.filter(order => order.status === status);
+                }
                 
-                row.innerHTML = `
-                    <td>${date}</td>
-                    <td>${order.trackingNumber}</td>
-                    <td>${address}</td>
-                    <td>${order.duration || 'N/A'}</td>
-                    <td class="${statusClass}">${order.status}</td>
-                `;
-                
-                tbody.appendChild(row);
+                displayOrders(filteredOrders);
             });
+            
+            // Search functionality
+            document.getElementById('search').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const filteredOrders = userOrders.filter(order => 
+                    order.trackingNumber.toLowerCase().includes(searchTerm) ||
+                    `${order.towerNumber}/${order.flatNumber}`.toLowerCase().includes(searchTerm)
+                );
+                
+                displayOrders(filteredOrders);
+            });
+            
+            function displayOrders(orders) {
+                const tbody = document.querySelector('#orderTable tbody');
+                tbody.innerHTML = '';
+                
+                if (orders.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="no-orders">
+                                No orders found. Create your first order from dashboard.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                // Sort by date (newest first)
+                orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    const date = new Date(order.createdAt).toLocaleString();
+                    const address = `Tower ${order.towerNumber}, Flat ${order.flatNumber}`;
+                    const statusClass = order.status.replace(' ', '-');
+                    
+                    row.innerHTML = `
+                        <td>${date}</td>
+                        <td>${order.trackingNumber}</td>
+                        <td>${address}</td>
+                        <td>${order.duration || 'In Progress'}</td>
+                        <td class="${statusClass}">${order.status}</td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+            }
         });
     </script>
 </body>
