@@ -58,3 +58,37 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// Initialize application data structure
+if (!localStorage.getItem('appData')) {
+    localStorage.setItem('appData', JSON.stringify({
+        users: [
+            { username: "sudeep1998", name: "Sudeep", orders: [] },
+            { username: "abss123", name: "Abhishek", orders: [] }
+        ],
+        allOrders: [] // Global order history
+    }));
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Login functionality
+    document.getElementById('loginForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value.trim();
+        const appData = JSON.parse(localStorage.getItem('appData'));
+        
+        const user = appData.users.find(u => u.username === username);
+        if (user) {
+            localStorage.setItem('currentUser', username);
+            window.location.href = 'dashboard.html';
+        } else {
+            alert('Invalid username. Only "sudeep1998" and "abss123" are valid.');
+        }
+    });
+
+    // Logout functionality
+    document.getElementById('logoutBtn')?.addEventListener('click', function() {
+        localStorage.removeItem('currentUser');
+        window.location.href = 'index.html';
+    });
+});
