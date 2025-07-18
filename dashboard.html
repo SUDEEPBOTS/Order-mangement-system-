@@ -4,11 +4,10 @@
     <title>Dashboard</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
+            font-family: 'Arial', sans-serif;
             padding: 20px;
-            background-color: #f5f7fa;
-            color: #333;
+            background-color: #f5f5f5;
+            margin: 0;
         }
         .header {
             display: flex;
@@ -16,51 +15,53 @@
             align-items: center;
             margin-bottom: 30px;
             padding-bottom: 15px;
-            border-bottom: 1px solid #e1e5eb;
+            border-bottom: 1px solid #ddd;
         }
-        .stats-container {
+        .stats {
             display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
         }
-        .stat-card {
+        .stat-box {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            flex: 1;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            min-width: 120px;
             text-align: center;
+            flex: 1;
         }
-        .stat-card h3 {
-            margin-top: 0;
+        .stat-box h3 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
             color: #666;
-            font-size: 16px;
         }
-        .stat-card p {
-            font-size: 28px;
+        .stat-box p {
+            margin: 0;
+            font-size: 24px;
             font-weight: bold;
-            margin: 10px 0 0;
             color: #2c3e50;
         }
-        .orders-section {
+        .orders-container {
             background: white;
-            border-radius: 10px;
+            border-radius: 8px;
             padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
-        .orders-section h2 {
+        .orders-container h2 {
             margin-top: 0;
             color: #2c3e50;
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
         }
         .order-card {
-            border: 1px solid #e1e5eb;
-            border-radius: 8px;
+            border: 1px solid #eee;
+            border-radius: 6px;
             padding: 15px;
             margin-bottom: 15px;
-            background-color: #f9fafc;
+            background: #fafafa;
         }
         .order-header {
             display: flex;
@@ -78,12 +79,12 @@
             font-weight: bold;
         }
         .status-in-progress {
-            background-color: #fff3cd;
+            background: #fff3cd;
             color: #856404;
         }
-        .status-pending {
-            background-color: #cce5ff;
-            color: #004085;
+        .status-delivered {
+            background: #d4edda;
+            color: #155724;
         }
         .order-details {
             display: grid;
@@ -93,7 +94,7 @@
         }
         .detail-label {
             font-size: 12px;
-            color: #666;
+            color: #777;
         }
         .detail-value {
             font-weight: bold;
@@ -109,219 +110,172 @@
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 14px;
         }
         .btn-primary {
-            background-color: #3498db;
-            color: white;
-        }
-        .btn-danger {
-            background-color: #e74c3c;
+            background: #3498db;
             color: white;
         }
         .btn-success {
-            background-color: #2ecc71;
+            background: #28a745;
             color: white;
         }
-        .nav-buttons {
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-group {
             display: flex;
             gap: 10px;
             margin-top: 20px;
+        }
+        .no-orders {
+            text-align: center;
+            color: #666;
+            padding: 20px;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>Welcome, <span id="userName"></span></h1>
-        <button id="logoutBtn" class="btn btn-danger">Logout</button>
+        <button class="btn btn-danger" onclick="logout()">Logout</button>
     </div>
 
-    <div class="stats-container">
-        <div class="stat-card">
+    <div class="stats">
+        <div class="stat-box">
             <h3>Today's Orders</h3>
             <p id="todayOrders">0</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-box">
             <h3>Total Orders</h3>
             <p id="totalOrders">0</p>
         </div>
-        <div class="stat-card">
-            <h3>Pending Delivery</h3>
+        <div class="stat-box">
+            <h3>Pending</h3>
             <p id="pendingOrders">0</p>
         </div>
     </div>
 
-    <div class="orders-section">
-        <h2>Orders In Progress</h2>
-        <div id="inProgressOrders">
-            <!-- Orders will be loaded here -->
+    <div class="orders-container">
+        <h2>Active Orders</h2>
+        <div id="activeOrders">
+            <!-- Active orders will appear here -->
         </div>
     </div>
 
-    <div class="orders-section">
-        <h2>Recent Orders</h2>
-        <div id="recentOrders">
-            <!-- Orders will be loaded here -->
-        </div>
-    </div>
-
-    <div class="nav-buttons">
-        <button id="newOrderBtn" class="btn btn-primary">Create New Order</button>
-        <button id="viewHistoryBtn" class="btn btn-primary">View Full History</button>
+    <div class="btn-group">
+        <button class="btn btn-primary" onclick="window.location.href='new-order.html'">Create New Order</button>
+        <button class="btn btn-primary" onclick="window.location.href='order-history.html'">View Full History</button>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get current user
-            const username = localStorage.getItem('currentUser');
-            if (!username) {
-                window.location.href = 'index.html';
-                return;
-            }
+        // Load user data
+        const user = JSON.parse(localStorage.getItem('currentUser'));
+        if (!user) window.location.href = 'index.html';
+        document.getElementById('userName').textContent = user.name;
 
-            // Get app data
-            const appData = JSON.parse(localStorage.getItem('appData')) || { allOrders: [] };
-            const user = appData.users.find(u => u.username === username);
-            
-            // Display user info
-            document.getElementById('userName').textContent = user?.name || username;
-
-            // Filter orders for current user
-            const userOrders = appData.allOrders.filter(order => order.username === username);
-            const todayOrders = userOrders.filter(order => {
-                return new Date(order.createdAt).toDateString() === new Date().toDateString();
-            });
-            const pendingOrders = userOrders.filter(order => order.status === 'In Progress');
-
-            // Update stats
-            document.getElementById('todayOrders').textContent = todayOrders.length;
-            document.getElementById('totalOrders').textContent = userOrders.length;
-            document.getElementById('pendingOrders').textContent = pendingOrders.length;
-
-            // Display in-progress orders
-            const inProgressContainer = document.getElementById('inProgressOrders');
-            if (pendingOrders.length > 0) {
-                pendingOrders.slice(0, 3).forEach(order => {
-                    inProgressContainer.appendChild(createOrderCard(order, true));
-                });
-            } else {
-                inProgressContainer.innerHTML = '<p>No orders in progress</p>';
-            }
-
-            // Display recent orders
-            const recentContainer = document.getElementById('recentOrders');
-            if (userOrders.length > 0) {
-                userOrders
-                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                    .slice(0, 5)
-                    .forEach(order => {
-                        recentContainer.appendChild(createOrderCard(order, false));
-                    });
-            } else {
-                recentContainer.innerHTML = '<p>No recent orders</p>';
-            }
-
-            // Button event listeners
-            document.getElementById('newOrderBtn').addEventListener('click', function() {
-                window.location.href = 'new-order.html';
-            });
-
-            document.getElementById('viewHistoryBtn').addEventListener('click', function() {
-                window.location.href = 'order-history.html';
-            });
-
-            document.getElementById('logoutBtn').addEventListener('click', function() {
-                localStorage.removeItem('currentUser');
-                window.location.href = 'index.html';
-            });
+        // Load order data
+        const appData = JSON.parse(localStorage.getItem('appData')) || { allOrders: [] };
+        const userOrders = appData.allOrders.filter(order => order.username === user.username);
+        
+        // Calculate stats
+        const todayOrders = userOrders.filter(order => {
+            return new Date(order.createdAt).toDateString() === new Date().toDateString();
         });
+        const pendingOrders = userOrders.filter(order => order.status === 'In Progress');
 
-        function createOrderCard(order, showActions) {
+        // Update stats
+        document.getElementById('todayOrders').textContent = todayOrders.length;
+        document.getElementById('totalOrders').textContent = userOrders.length;
+        document.getElementById('pendingOrders').textContent = pendingOrders.length;
+
+        // Display active orders
+        const activeOrdersContainer = document.getElementById('activeOrders');
+        if (pendingOrders.length > 0) {
+            pendingOrders.forEach(order => {
+                activeOrdersContainer.appendChild(createOrderCard(order));
+            });
+        } else {
+            activeOrdersContainer.innerHTML = '<div class="no-orders">No active orders found</div>';
+        }
+
+        // Create order card element
+        function createOrderCard(order) {
             const card = document.createElement('div');
             card.className = 'order-card';
-            
-            const statusClass = order.status.replace(' ', '-').toLowerCase();
-            const date = new Date(order.createdAt).toLocaleString();
-            const duration = order.duration || 'In progress';
             
             card.innerHTML = `
                 <div class="order-header">
                     <span class="order-id">${order.trackingNumber}</span>
-                    <span class="order-status status-${statusClass}">${order.status}</span>
+                    <span class="order-status status-in-progress">In Progress</span>
                 </div>
                 <div class="order-details">
                     <div>
-                        <div class="detail-label">Date</div>
-                        <div class="detail-value">${date}</div>
+                        <div class="detail-label">Tower/Flat</div>
+                        <div class="detail-value">${order.towerNumber}/${order.flatNumber}</div>
                     </div>
                     <div>
-                        <div class="detail-label">Address</div>
-                        <div class="detail-value">Tower ${order.towerNumber}, Flat ${order.flatNumber}</div>
+                        <div class="detail-label">Started At</div>
+                        <div class="detail-value">${new Date(order.createdAt).toLocaleString()}</div>
                     </div>
                     <div>
                         <div class="detail-label">Duration</div>
-                        <div class="detail-value">${duration}</div>
+                        <div class="detail-value">${calculateDuration(order.startTime)}</div>
                     </div>
                 </div>
+                <div class="order-actions">
+                    <button class="btn btn-success" onclick="markDelivered('${order.trackingNumber}')">Mark Delivered</button>
+                    <button class="btn btn-danger" onclick="cancelOrder('${order.trackingNumber}')">Cancel Order</button>
+                </div>
             `;
-
-            if (showActions && order.status === 'In Progress') {
-                const actionsDiv = document.createElement('div');
-                actionsDiv.className = 'order-actions';
-                actionsDiv.innerHTML = `
-                    <button class="btn btn-success" data-id="${order.trackingNumber}">Mark Delivered</button>
-                    <button class="btn btn-danger" data-id="${order.trackingNumber}">Cancel Order</button>
-                `;
-                card.appendChild(actionsDiv);
-
-                // Add event listeners
-                card.querySelector('.btn-success').addEventListener('click', function() {
-                    markOrderDelivered(order.trackingNumber);
-                });
-                
-                card.querySelector('.btn-danger').addEventListener('click', function() {
-                    cancelOrder(order.trackingNumber);
-                });
-            }
-
+            
             return card;
         }
 
-        function markOrderDelivered(trackingNumber) {
+        // Calculate duration for display
+        function calculateDuration(startTime) {
+            if (!startTime) return 'Just started';
+            const seconds = Math.floor((new Date().getTime() - startTime) / 1000);
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${hours}h ${minutes}m ${secs}s`;
+        }
+
+        // Mark order as delivered
+        function markDelivered(trackingNumber) {
             const appData = JSON.parse(localStorage.getItem('appData'));
             const order = appData.allOrders.find(o => o.trackingNumber === trackingNumber);
             
             if (order) {
                 order.status = 'Delivered';
                 order.completedAt = new Date().toISOString();
-                
-                // Calculate duration
-                const start = new Date(order.startTime || order.createdAt);
-                const end = new Date();
-                const durationMs = end - start;
-                
-                const hours = Math.floor(durationMs / (1000 * 60 * 60));
-                const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
-                order.duration = `${hours > 0 ? hours + 'h ' : ''}${minutes}m`;
-                
+                order.duration = calculateDuration(order.startTime);
                 localStorage.setItem('appData', JSON.stringify(appData));
                 alert('Order marked as delivered!');
                 window.location.reload();
             }
         }
 
+        // Cancel order
         function cancelOrder(trackingNumber) {
             if (confirm('Are you sure you want to cancel this order?')) {
                 const appData = JSON.parse(localStorage.getItem('appData'));
-                const orderIndex = appData.allOrders.findIndex(o => o.trackingNumber === trackingNumber);
+                const order = appData.allOrders.find(o => o.trackingNumber === trackingNumber);
                 
-                if (orderIndex !== -1) {
-                    appData.allOrders[orderIndex].status = 'Cancelled';
+                if (order) {
+                    order.status = 'Cancelled';
                     localStorage.setItem('appData', JSON.stringify(appData));
                     alert('Order cancelled!');
                     window.location.reload();
                 }
             }
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
         }
     </script>
 </body>
