@@ -15,8 +15,8 @@ function initializeAppData() {
                     lastLogin: null
                 },
                 { 
-                    username: "abss123", 
-                    name: "Abhishek",
+                    username: "sudeep", 
+                    name: "sudeep",
                     email: "abhishek@example.com",
                     phone: "+919876543210",
                     age: 28,
